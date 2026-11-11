@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Асистент МІС — Запис та Документація</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+
+    <div class="max-w-4xl mx-auto w-full p-6">
+        <header class="mb-8 border-b border-slate-700 pb-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-blue-400">🏥 Medical AI Assistant</h1>
+                <p class="text-xs text-slate-400">Автоматизація запису пацієнтів та генерація документації</p>
+            </div>
+            <div class="text-right">
+                <span class="text-xs bg-blue-900/60 text-blue-300 px-3 py-1 rounded-full border border-blue-700">Llama 3.1 8B (Q4_K_M)</span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <button onclick="setTemplate('json')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left border border-slate-700 transition">
+                <div class="text-sm font-semibold text-blue-300">📋 Парсер запису (JSON)</div>
+                <div class="text-xs text-slate-400">Витяг лікаря, дати та часу</div>
+            </button>
+            <button onclick="setTemplate('anamnesis')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left border border-slate-700 transition">
+                <div class="text-sm font-semibold text-green-300">🩺 Первинний анамнез</div>
+                <div class="text-xs text-slate-400">Форматування скарг пацієнта</div>
+            </button>
+            <button onclick="setTemplate('sms')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-left border border-slate-700 transition">
+                <div class="text-sm font-semibold text-purple-300">💬 SMS-Нагадування</div>
+                <div class="text-xs text-slate-400">Генерація коротка повідомлення</div>
+            </button>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium mb-2 text-slate-300">Вхідні дані пацієнта / Запит:</label>
+            <textarea id="promptInput" rows="4" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 text-slate-100 placeholder-slate-500" placeholder="Введіть текст звернення пацієнта..."></textarea>
+
+            <div class="flex justify-between items-center mt-3">
+                <div class="text-xs text-slate-400">
+                    Параметри: <span class="text-slate-200">Temp: 0.1 | Max Tokens: 500 | Ctx: 4096</span>
+                </div>
+                <button id="submitBtn" onclick="generateResponse()" class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-2 rounded-lg transition flex items-center gap-2">
+                    <span>Згенерувати</span>
+                </button>
+            </div>
+        </div>
+        <div id="statusAlert" class="hidden mb-4 p-3 rounded-lg text-sm"></div>
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 min-h-[160px] relative">
+            <div class="flex justify-between items-center mb-2 border-b border-slate-700 pb-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Результат обробки (Стрімінг):</span>
+                <span id="speedMetric" class="text-xs font-mono text-blue-400"></span>
+            </div>
+            <pre id="outputContainer" class="whitespace-pre-wrap font-mono text-sm text-slate-200 overflow-x-auto min-h-[100px]"></pre>
+        </div>
+    </div>
+
+    <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-800">
+        Усі обчислення виконуються локально через Ollama API (http://localhost:11434/v1)
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:11434/v1/chat/completions';
+        const MODEL_NAME = 'llama3.1:8b';
+
+        const SYSTEM_PROMPTS = {
+  json: `Ти — медичний асистент МІС. Витягни з тексту дані у форматі JSON із ключами: doctor_specialty, date, time, chief_complaint.
+
+ПРАВИЛА:
+1. Відповідай ВИКЛЮЧНО валідним JSON-об'єктом.
+2. Якщо якась інформація (дата, час, спеціальність чи скарга) відсутня у тексті — обов'язково вказуй значення null. НЕ вигадуй дані!
+
+ПРИКЛАД (Негативний сценарій — відсутні дата та час):
+Вхід: Запишіть мене на прийом до офтальмолога, бо дуже печуть очі після роботи.
+Відповідь:
+{
+  "doctor_specialty": "офтальмолог",
+  "date": null,
+  "time": null,
+  "chief_complaint": "дуже печуть очі після роботи"
+}`,
+
+    anamnesis: `Ти — лікар-терапевт МІС. Перетвори неструктуровану скаргу пацієнта на структурований медичний висновок.
+    Правила:
+    1. Витягуй лише наявні факти. НЕ використовуй прогалини вида "_____".
+    2. Якщо даних про вік/стать немає — не згадуй їх.
+    3. Мова: суворо українська медична термінологія.
+    Структура:
+    **Скарги пацієнта**
+    **Анамнез захворювання**
+    **Рекомендований первинний огляд**`,
+
+    sms: `Ти — бот клініки. Згенеруй коротке (до 160 символів), ввічливе SMS-нагадування.
+
+    ПРАВИЛА:
+    1. Мова: ВИКЛЮЧНО українська. Перекладай УСІ англійські слова (наприклад: tomorrow -> завтра, cab -> каб., Doctor -> лікар, Patient -> Пацієнт). ЖОДНОГО англійського слова у відповіді!
+    2. Обов'язково використовуй правильний кличний відмінок для імен (Олена -> Олено, Марія -> Маріє, Іван -> Іване, Дмитро -> Дмитре).
+
+    ПРИКЛАДИ:
+    Вхід: Patient: Maria. Doctor: Dermatologist Bondar. Date: tomorrow 11:00 cab 5.
+    Відповідь: Шановна Маріє! Нагадуємо про прийом у дерматолога Бондаря завтра об 11:00 (каб. 5). Клініка.
+
+    Вхід: Пацієнт: Дмитро Сидоренко. Лікар: Невролог Ткаченко Р.П. Час: завтра о 14:00, кабінет 310.
+    Відповідь: Шановний Дмитре! Нагадуємо про прийом у невролога Ткаченка Р.П. завтра о 14:00 (каб. 310). Клініка.`
+    };
+
+        let currentMode = 'json';
+
+        function setTemplate(mode) {
+            currentMode = mode;
+            const input = document.getElementById('promptInput');
+            if (mode === 'json') {
+                input.value = "Хочу записатися до кардіолога на наступний вівторок о 14:30 через частий біль у грудях та задишку.";
+            } else if (mode === 'anamnesis') {
+                input.value = "Голова болить вже три дні у скронях, особливо зранку, трохи нудить після їжі, тиск піднімається до 135 на 90.";
+            } else if (mode === 'sms') {
+                input.value = "Пацієнт: Іван Петренко. Лікар: Терапевт Коваль В.О. Час: завтра о 10:00, кабінет 204.";
+            }
+        }
+        setTemplate('json');
+
+        async function generateResponse() {
+            const promptInput = document.getElementById('promptInput').value.trim();
+            const outputContainer = document.getElementById('outputContainer');
+            const statusAlert = document.getElementById('statusAlert');
+            const submitBtn = document.getElementById('submitBtn');
+            const speedMetric = document.getElementById('speedMetric');
+
+            if (!promptInput) {
+                showError("Будь ласка, введіть текст запиту.");
+                return;
+            }
+
+            hideError();
+            outputContainer.textContent = "";
+            speedMetric.textContent = "";
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            const startTime = performance.now();
+            let generatedTokens = 0;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: MODEL_NAME,
+                        messages: [
+                            { role: 'system', content: SYSTEM_PROMPTS[currentMode] },
+                            { role: 'user', content: promptInput }
+                        ],
+                        temperature: 0.1,
+                        max_tokens: 500,
+                        stream: true
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Помилка сервера: ${response.status} ${response.statusText}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let buffer = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (trimmed.startsWith("data: ")) {
+                            const jsonStr = trimmed.substring(6);
+                            if (jsonStr === "[DONE]") break;
+
+                            try {
+                                const parsed = JSON.parse(jsonStr);
+                                const content = parsed.choices[0]?.delta?.content || "";
+                                if (content) {
+                                    outputContainer.textContent += content;
+                                    generatedTokens++;
+                                    const elapsedSec = (performance.now() - startTime) / 1000;
+                                    speedMetric.textContent = `${(generatedTokens / elapsedSec).toFixed(1)} tok/s`;
+                                }
+                            } catch (e) {
+                            }
+                        }
+                    }
+                }
+
+                if (!outputContainer.textContent.trim()) {
+                    showError("Модель повернула порожню відповідь. Перевірте статус рантайму.");
+                }
+
+            } catch (err) {
+                if (err.name === 'TypeError' && err.message.includes('fetch')) {
+                    showError("Не вдалося з'єднатися з Ollama. Переконайтеся, що сервер запущено (`ollama serve`) за адресою http://localhost:11434.");
+                } else {
+                    showError(`Помилка під час генерації: ${err.message}`);
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function showError(msg) {
+            const statusAlert = document.getElementById('statusAlert');
+            statusAlert.textContent = `⚠️ ${msg}`;
+            statusAlert.className = "mb-4 p-3 rounded-lg text-sm bg-red-900/50 text-red-200 border border-red-700 block";
+        }
+
+        function hideError() {
+            const statusAlert = document.getElementById('statusAlert');
+            statusAlert.className = "hidden";
+        }
+    </script>
+</body>
+</html>
