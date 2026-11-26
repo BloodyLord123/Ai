@@ -1,0 +1,141 @@
+{
+  "timestamp": "20261126_045729",
+  "date_human": "2026-11-26 04:57:29",
+  "subject": "МАПЗ",
+  "guidelines_file": "Лабораторна_робота_01.html",
+  "report_target": "lab1",
+  "variant": "Варіант 1",
+  "files_checked": [
+    "software-modeling-and-analysis\\README.md",
+    "software-modeling-and-analysis\\use.puml",
+    "software-modeling-and-analysis\\Лр1_Айсін.pdf"
+  ],
+  "images_checked": [
+    "software-modeling-and-analysis\\Лр1_Айсін.pdf [стор. 1]",
+    "software-modeling-and-analysis\\Лр1_Айсін.pdf [стор. 2]",
+    "software-modeling-and-analysis\\Лр1_Айсін.pdf [стор. 3]",
+    "software-modeling-and-analysis\\Лр1_Айсін.pdf [стор. 4]",
+    "software-modeling-and-analysis\\Лр1_Айсін.pdf [стор. 5]",
+    "software-modeling-and-analysis\\Лр1_Айсін.pdf [стор. 6]",
+    "software-modeling-and-analysis\\Лр1_Айсін.pdf [стор. 7]",
+    "software-modeling-and-analysis\\Лр1_Айсін.pdf [стор. 8]",
+    "software-modeling-and-analysis\\Лр1_Айсін.pdf [стор. 9]",
+    "software-modeling-and-analysis\\Лр1_Айсін.pdf [стор. 10]"
+  ],
+  "batch_size": 10,
+  "readiness_score": 100,
+  "summary_counts": {
+    "total": 14,
+    "pass": 14,
+    "warning": 0,
+    "fail": 0
+  },
+  "metrics": {
+    "model": "gemini-3.5-flash-lite",
+    "elapsed_seconds": 14.35,
+    "prompt_tokens": 41514,
+    "output_tokens": 2742,
+    "total_tokens": 44256
+  },
+  "checks": [
+    {
+      "requirement_id": "4.1",
+      "requirement_text": "Титульний аркуш (ПІБ, група, тема, варіант предметної області).",
+      "status": "PASS",
+      "evidence_from_work": "Звіт Лр1_Айсін.pdf [стор. 1] містить ПІБ студента, групу, повну назву кафедри, тему лабораторної роботи та номер варіанта.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "4.2",
+      "requirement_text": "Порівняльна таблиця CASE-інструментів (Частина 1).",
+      "status": "PASS",
+      "evidence_from_work": "Звіт Лр1_Айсін.pdf [стор. 3] містить детальну порівняльну таблицю PlantUML та Draw.io за заданими критеріями.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "4.3",
+      "requirement_text": "Перелік акторів із описом ролей.",
+      "status": "PASS",
+      "evidence_from_work": "Звіт Лр1_Айсін.pdf [стор. 4] містить таблицю акторів (Гість, Користувач, Пацієнт, Лікар, Адміністратор, Поштовий сервіс) із детальними описами ролей.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "4.4",
+      "requirement_text": "Перелік варіантів використання (не менше 8-10) із зазначенням типів зв'язків.",
+      "status": "PASS",
+      "evidence_from_work": "Звіт Лр1_Айсін.pdf [стор. 4-6] містить перелік із 18 варіантів використання із зазначенням типів зв'язків (include, extend, generalization).",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "4.5",
+      "requirement_text": "Графічна Use Case діаграма (експортоване зображення або PlantUML-код).",
+      "status": "PASS",
+      "evidence_from_work": "Звіт Лр1_Айсін.pdf [стор. 6] та файл use.puml містять повну графічну діаграму Use Case у межах системи з акторами та зв'язками.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "4.6",
+      "requirement_text": "Текстова специфікація для 3 обраних варіантів використання.",
+      "status": "PASS",
+      "evidence_from_work": "Звіт Лр1_Айсін.pdf [стор. 6-10] містить повні текстові специфікації для UC6, UC13 та UC4 за вимаганою структурою.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "4.7",
+      "requirement_text": "(За бажанням) Порівняння результату, згенерованого ШІ, з фінальною авторською версією — перелік виявлених і виправлених помилок ШІ.",
+      "status": "PASS",
+      "evidence_from_work": "Пункт є опціональним (за бажанням), у звіті зафіксовано використання та висновки щодо інтеграції ШІ.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "4.8",
+      "requirement_text": "Висновки.",
+      "status": "PASS",
+      "evidence_from_work": "Звіт Лр1_Айсін.pdf [стор. 10] містить змістовні висновки щодо виконаної роботи та опанованих інструментів.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "Вар-1",
+      "requirement_text": "Оберіть предметну область для свого курсового завдання (якщо ще не обрано — узгодьте з викладачем).",
+      "status": "PASS",
+      "evidence_from_work": "Звіт Лр1_Айсін.pdf [стор. 3]: 'Вебдодаток для автоматизації запису пацієнтів та генерації медичної документації'.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "Вар-2",
+      "requirement_text": "Визначте всіх акторів системи (людей та зовнішні системи), враховуючи, що актором може бути й неосновний учасник (наприклад, платіжна система, адміністратор).",
+      "status": "PASS",
+      "evidence_from_work": "Звіт Лр1_Айсін.pdf [стор. 4] та use.puml чітко визначають акторів: Гість, Користувач, Пацієнт, Лікар, Адміністратор та зовнішню систему Поштовий сервіс.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "Вар-3",
+      "requirement_text": "Визначте щонайменше 8-10 варіантів використання, включно з прикладами відношень <<include>>, <<extend>> та хоча б одним прикладом узагальнення (generalization) акторів або Use Case.",
+      "status": "PASS",
+      "evidence_from_work": "Визначено 18 варіантів використання, наведено зв'язки <<include>>, <<extend>> та узагальнення акторів (Пацієнт, Лікар, Адміністратор спадкують Користувача) у файлі Лр1_Айсін.pdf на сторінках 4-6.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "Вар-4",
+      "requirement_text": "Побудуйте графічну Use Case діаграму (в обраному CASE-інструменті) з коректною межею системи.",
+      "status": "PASS",
+      "evidence_from_work": "Рисунок 1.3 - Варіанти використання веб-застосунку лікарні на сторінці 6 звіту Лр1_Айсін.pdf та файл software-modeling-and-analysis/use.puml.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "Вар-5",
+      "requirement_text": "Напишіть повну текстову специфікацію для 3 обраних (найважливіших) варіантів використання за структурою п. 1.3.",
+      "status": "PASS",
+      "evidence_from_work": "Специфікації для UC6, UC13 та UC4 наведено на сторінках 7-10 звіту Лр1_Айсін.pdf.",
+      "recommendation": "Виправлень не потрібно"
+    },
+    {
+      "requirement_id": "Вар-6",
+      "requirement_text": "За бажанням: згенеруйте чернетку діаграми за допомогою ШІ-асистента, порівняйте її з власноруч побудованою, зафіксуйте у звіті виявлені розбіжності/помилки ШІ.",
+      "status": "PASS",
+      "evidence_from_work": "Вимога виконана на добровільній основі, у звіті пункт присутній (стор. 10).",
+      "recommendation": "Виправлень не потрібно"
+    }
+  ],
+  "saved_to": "E:\\mkr\\mkr1\\evidence\\МАПЗ\\audit_20261126_045729.json"
+}
